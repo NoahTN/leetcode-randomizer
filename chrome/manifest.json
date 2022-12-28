@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "LeetCode Randomizer",
+  "version": "1.0",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_page": "index.html",
+  "host_permissions": [
+    "https://leetcode.com/*"
+  ],
+  "content_scripts": [{
+    "matches": [
+      "https://leetcode.com/*"
+    ],
+    "js": ["content.js"]
+  }]
+}
+ 
