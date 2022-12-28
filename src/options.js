@@ -35,7 +35,6 @@ const links = {
 function getProblems(count, category="All", minDifficulty="E", maxDifficulty="H") {
    const result = new Set();
    const problems = Object.values(links).reduce((all, curr) => all.concat(curr));
-   console.log(problems);
    while(result.size < count) {
       result.add(Math.floor(Math.random() * problems.length));
    }
