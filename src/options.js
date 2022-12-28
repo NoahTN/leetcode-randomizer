@@ -46,7 +46,7 @@ function getProblems(count, category="All", minDifficulty="E", maxDifficulty="H"
 root.render(
    <div> 
       {getProblems(3).map(url => 
-         <p>{ url }</p>
+         <p key={ url }><a href={ url }>{ url }</a></p>
       ) 
    }</div>
 );
