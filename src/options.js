@@ -130,6 +130,8 @@ function CheckboxGroup(props) {
    function handleChange(i) {
       const copy = [...checked];
       copy[i] = !copy[i];
+      if(!copy[i])
+         setAllChecked(false);
       setChecked(copy);
       props.updateSettings(props.modifier, copy, props.values ? props.values : props.items);
    }
