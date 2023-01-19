@@ -1,43 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
+const links = require("./links.json");
+import "./popup.css";
 
-const links = {
-   "Arrays & Hashing": [
-      ["https://leetcode.com/problems/contains-duplicate/", "E"],
-      ["https://leetcode.com/problems/valid-anagram/", "E"],
-      ["https://leetcode.com/problems/two-sum/", "E"],
-      ["https://leetcode.com/problems/group-anagrams/", "M"],
-      ["https://leetcode.com/problems/top-k-frequent-elements/", "M"],
-      ["https://leetcode.com/problems/product-of-array-except-self/", "M"],
-      ["https://leetcode.com/problems/valid-sudoku/", "M"],
-      ["https://leetcode.com/problems/longest-consecutive-sequence/", "M"],
-   ],
-   "Two Pointers": [
-      ["https://leetcode.com/problems/valid-palindrome/", "E"],
-      ["https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/", "M"],
-      ["https://leetcode.com/problems/3sum/", "M"],
-      ["https://leetcode.com/problems/container-with-most-water/", "M"],
-      ["https://leetcode.com/problems/trapping-rain-water/", "H"]
-   ],
-   "Sliding Window": [
-      ["https://leetcode.com/problems/best-time-to-buy-and-sell-stock/", "E"],
-      ["https://leetcode.com/problems/longest-substring-without-repeating-characters/", "M"],
-      ["https://leetcode.com/problems/longest-repeating-character-replacement/", "M"],
-      ["https://leetcode.com/problems/permutation-in-string/", "M"]
-   ],
-   "Stack": [
-      ["https://leetcode.com/problems/valid-parentheses/", "E"],
-      ["https://leetcode.com/problems/min-stack/", "M"],
-      ["https://leetcode.com/problems/evaluate-reverse-polish-notation/", "M"],
-      ["https://leetcode.com/problems/generate-parentheses/", "M"],
-      ["https://leetcode.com/problems/daily-temperatures/", "M"],
-      ["https://leetcode.com/problems/car-fleet/", "M"],
-      ["https://leetcode.com/problems/largest-rectangle-in-histogram/", "H"]
-   ],
-   "Custom": [
-
-   ]
-};
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
    <ProblemBody/>
@@ -84,6 +49,10 @@ function ProblemBody() {
       return result.filter(problem => newSettings.difficulties.includes(problem[1]));
    }
 
+   function handleRefreshClick() {
+      updateProblems(settings);
+   }
+
    return <>
       <div> 
          {problems.map(url => 
@@ -96,7 +65,8 @@ function ProblemBody() {
             "Arrays & Hashing",
             "Two Pointers",
             "Sliding Window",
-            "Stack"
+            "Stack",
+            "Binary Search"
          ]}
          updateSettings={ updateSettings }
       />
@@ -114,6 +84,9 @@ function ProblemBody() {
          ]}
          updateSettings={ updateSettings }
       />
+      <button onClick={ handleRefreshClick }>
+         Refresh
+      </button>
    </>
 }
 
@@ -164,7 +137,3 @@ function CheckboxGroup(props) {
       )}
    </div>
 }
-
-
-
-

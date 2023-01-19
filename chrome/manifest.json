@@ -5,7 +5,9 @@
   "background": {
     "service_worker": "background.js"
   },
-  "options_page": "index.html",
+  "action": {
+    "default_popup": "index.html"
+  },
   "host_permissions": [
     "https://leetcode.com/*"
   ],

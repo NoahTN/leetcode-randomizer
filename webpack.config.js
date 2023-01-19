@@ -6,7 +6,7 @@ module.exports = {
    mode: "development",
    devtool: 'cheap-module-source-map',
    entry: {
-      options: "./src/options.js",
+      popup: "./src/popup.js",
       content: "./src/content.js",
       background: "./src/background.js",
    },
@@ -22,7 +22,7 @@ module.exports = {
          ]
       }),
       new HtmlWebpackPlugin({
-         template: "./src/options.html",
+         template: "./src/popup.html",
          inject: false
       }),
    ],
