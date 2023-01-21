@@ -9,20 +9,34 @@ root.render(
 );
 
 function ProblemBody() {
+   const difficulties = ["E", "M", "H"];
    const [problems, setProblems] = useState([]);
-   const [settings, setSettings] = useState({
-      count: 3,
-      categories: [],
-      difficulties: ["E", "M", "H"]
-   });
-
+   const [settings, setSettings] = useState(null);
+  
    useEffect(() => {
-      updateProblems(settings);
+      chrome.storage.sync.get(["settings"], (result) => {
+         console.log(result);
+         if(result.settings) {
+            setSettings(result.settings);
+            updateProblems(result.settings);
+         }
+         else {
+            const defaultSettings = {
+               count: 3,
+               categories: Array(Object.keys(links).length).fill(true),
+               difficulties: Array(3).fill(true)
+            };
+            setSettings(defaultSettings);
+            updateProblems(defaultSettings);
+         }
+      });
    }, [])
 
-   function updateSettings(modifier, isChecked, values) {
-      const copy = { ...settings }
-      copy[modifier] = values.filter((e, i) => isChecked[i]);
+   function updateSettings(modifier, isChecked) {
+      const copy = {...settings}
+      copy[modifier] = isChecked;
+      console.log(copy);
+      chrome.storage.sync.set({ settings: copy });
       setSettings(copy);
       updateProblems(copy);
    }
@@ -37,16 +51,16 @@ function ProblemBody() {
    }
    
    function filterProblems(newSettings) {
-      let result;
-      if(newSettings.categories.length && newSettings.difficulties.length) {
-         result = Object.entries(links).filter(e => newSettings.categories.includes(e[0]))
-            .map(pair => pair[1])
-            .reduce((all, curr) => all.concat(curr));
+      let result = Object.entries(links).filter((e, i) => newSettings.categories[i]);
+      if(result.length) {
+         result = result.map(pair => pair[1]).reduce((all, curr) => all.concat(curr));
       }
-      else {
-         result = Object.values(links).reduce((all, curr) => all.concat(curr))
-      }
-      return result.filter(problem => newSettings.difficulties.includes(problem[1]));
+      return result.filter(problem => newSettings.difficulties[difficulties.indexOf(problem[1])]);
+   }
+
+   function handleLinkClick(e, url) {
+      e.preventDefault();
+      chrome.tabs.create({url: url, active: false});
    }
 
    function handleRefreshClick() {
@@ -56,21 +70,18 @@ function ProblemBody() {
    return <>
       <div> 
          {problems.map(url => 
-            <p key={ url }><a href={ url }>{ url }</a></p>
+            <p key={ url }>
+               <a href= { url } onClick={(e) => { handleLinkClick(e, url) }} onAuxClick={(e) => { handleLinkClick(e, url) }}>{ url }</a>
+            </p>
          ) 
       }</div>
-      <CheckboxGroup
+      {settings && <CheckboxGroup
          modifier="categories"
-         items={[
-            "Arrays & Hashing",
-            "Two Pointers",
-            "Sliding Window",
-            "Stack",
-            "Binary Search"
-         ]}
+         items={[...Object.keys(links)]}
          updateSettings={ updateSettings }
-      />
-      <CheckboxGroup
+         checked={ settings.categories }
+      />}
+      {settings && <CheckboxGroup
          modifier="difficulties"
          items={[
             "Easy",
@@ -83,7 +94,8 @@ function ProblemBody() {
             "H"
          ]}
          updateSettings={ updateSettings }
-      />
+         checked={ settings.difficulties }
+      />}
       <button onClick={ handleRefreshClick }>
          Refresh
       </button>
@@ -91,26 +103,27 @@ function ProblemBody() {
 }
 
 function CheckboxGroup(props) {
-   const [allChecked, setAllChecked] = useState(true);
-   const [checked, setChecked] = useState(Array(props.items.length).fill(true));
-
-   function checkAll() {
-      setChecked(Array(props.items.length).fill(!allChecked));
-      props.updateSettings(props.modifier, Array(props.items.length).fill(!allChecked), props.values ? props.values : props.items);
-      setAllChecked(!allChecked);
-   }
+   const [checked, setChecked] = useState([props.checked.every(e => e)].concat(props.checked));
+   console.log(["Group", [props.checked.every(e => e)].concat(props.checked)]);
 
    function handleChange(i) {
       const copy = [...checked];
       copy[i] = !copy[i];
-      if(!copy[i])
-         setAllChecked(false);
+      if(i === 0) {
+         for(let i = 1; i < copy.length; ++i) {
+            copy[i] = copy[0];
+         }
+      }
+      else {
+         copy[0] = copy.slice(1).every(e => e);
+      }
       setChecked(copy);
-      props.updateSettings(props.modifier, copy, props.values ? props.values : props.items);
+      props.updateSettings(props.modifier, copy.slice(1), props.values || props.items);
    }
 
    function Checkbox(props) {
-      return <label>
+      console.log(props);
+      return <label className="checkbox">
          <input
             type="checkbox"
             onChange={ props.handleChange }
@@ -120,18 +133,18 @@ function CheckboxGroup(props) {
       </label>
    }
 
-   return <div>
+   return <div className="checkbox-group">
       <Checkbox
          label="All" 
-         handleChange={ checkAll }
-         isChecked={ allChecked }
+         handleChange={() => handleChange(0)}
+         isChecked={ checked[0] }
       />
-      { props.items.map((item, index) => 
+      {props.items.map((item, index) => 
          <Checkbox
             key={ item }
             label={ item }
-            handleChange={() => handleChange(index)}
-            isChecked={ checked[index] }
+            handleChange={() => handleChange(index+1)}
+            isChecked={ checked[index+1] }
             value={ props.values ? props.values[index] : null }
          />
       )}
