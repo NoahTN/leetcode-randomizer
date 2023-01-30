@@ -35,7 +35,6 @@ function ProblemBody() {
    function updateSettings(modifier, isChecked) {
       const copy = {...settings}
       copy[modifier] = isChecked;
-      console.log(copy);
       chrome.storage.sync.set({ settings: copy });
       setSettings(copy);
       updateProblems(copy);
@@ -47,7 +46,7 @@ function ProblemBody() {
       while(result.size < problems.length && result.size < newSettings.count) {
          result.add(Math.floor(Math.random() * problems.length));
       }
-      setProblems([...result].map(i => problems[i][0]));
+      setProblems([...result].map(i => problems[i]));
    }
    
    function filterProblems(newSettings) {
@@ -55,7 +54,7 @@ function ProblemBody() {
       if(result.length) {
          result = result.map(pair => pair[1]).reduce((all, curr) => all.concat(curr));
       }
-      return result.filter(problem => newSettings.difficulties[difficulties.indexOf(problem[1])]);
+      return result.filter(problem => newSettings.difficulties[difficulties.indexOf(problem[2])]);
    }
 
    function handleLinkClick(e, url) {
@@ -69,9 +68,9 @@ function ProblemBody() {
 
    return <>
       <div> 
-         {problems.map(url => 
-            <p key={ url }>
-               <a href= { url } onClick={(e) => { handleLinkClick(e, url) }} onAuxClick={(e) => { handleLinkClick(e, url) }}>{ url }</a>
+         {problems.map(prob => 
+            <p key={ prob[1] }>
+               <a href= { prob[1] } onClick={(e) => { handleLinkClick(e, prob[1]) }} onAuxClick={(e) => { handleLinkClick(e, prob[1]) }}>{ prob[0] },{ prob[2] }</a>
             </p>
          ) 
       }</div>
